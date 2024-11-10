@@ -9,6 +9,9 @@ import AdminRoot from './root/AdminRoot.tsx';
 import Login from './pages/Login.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
 import Reservations from './pages/admin/Reservations.tsx';
+import CustomerSupport from './pages/Support.tsx';
+import Guidelines from './pages/Guidelines.tsx';
+import MapVIsitor from './pages/MapVIsitor.tsx';
 
 const router = createBrowserRouter([
   {
@@ -18,6 +21,21 @@ const router = createBrowserRouter([
       {
         path: 'contact',
         element: <Contact />,
+      },
+
+      {
+        path: 'support',
+        element: <CustomerSupport />,
+      },
+
+      {
+        path: 'guidelines',
+        element: <Guidelines />,
+      },
+
+      {
+        path: 'map-visitor',
+        element: <MapVIsitor />,
       },
     ],
   },

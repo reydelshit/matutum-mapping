@@ -1,6 +1,6 @@
 import { Contact2Icon, Mail, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import MainImage from '@/assets/main.png';
 const Contact = () => {
   return (
     <div className="w-full  text-center h-[800px]">
@@ -25,11 +25,13 @@ const Contact = () => {
         </div>
       </div>
 
-      <img
-        className="w-full object-cover h-[450px] rounded-md"
-        src="https://cdn.prod.website-files.com/611c643a9a410952b2effdcc/612f2d0a41c629276903a472_photo_holygardens_matutum.jpg"
-        alt="matutum"
-      />
+      <div className="flex justify-center items-center">
+        <img
+          className="w-full  object-cover h-[500px] rounded-md"
+          src={MainImage}
+          alt="matutum"
+        />
+      </div>
     </div>
   );
 };

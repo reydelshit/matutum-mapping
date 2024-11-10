@@ -122,7 +122,7 @@ const GraveModal = ({
   };
 
   return (
-    <div className="absolute top-0 bg-black h-screen w-screen justify-center z-10 bg-opacity-80 flex items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 text-black">
       <div className="w-[80%] h-[80%] border-2 bg-white rounded-2xl p-4">
         <div className="flex justify-between items-center w-full">
           <div className="flex gap-4">

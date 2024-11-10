@@ -8,6 +8,7 @@ import Contact from './pages/Contact.tsx';
 import AdminRoot from './root/AdminRoot.tsx';
 import Login from './pages/Login.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
+import Reservations from './pages/admin/Reservations.tsx';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,11 @@ const router = createBrowserRouter([
       {
         path: 'login',
         element: <Login />,
+      },
+
+      {
+        path: 'reservations',
+        element: <Reservations />,
       },
     ],
   },

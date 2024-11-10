@@ -6,7 +6,6 @@ import axios from 'axios';
 interface PlotProps {
   id: string;
   d: string;
-  fill: string;
   onClick: () => void;
   selectedPatay: string;
 }
@@ -21,13 +20,7 @@ interface GraveItem {
   plot_no: number;
 }
 
-export default function Plot({
-  id,
-  d,
-  fill,
-  onClick,
-  selectedPatay,
-}: PlotProps) {
+export default function Plot({ id, d, onClick, selectedPatay }: PlotProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const pathRef = useRef<SVGPathElement>(null);
@@ -77,9 +70,10 @@ export default function Plot({
         }}
       >
         <div className="relative flex flex-col items-center">
-          <div className="bg-white rounded-lg px-3 py-2 shadow-lg mb-1">
-            <span className="text-sm whitespace-nowrap">plot no {id}</span>
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white transform rotate-45" />
+          <div className="bg-white text-black rounded-lg px-3 py-2 shadow-lg mb-1">
+            <span className="text-sm whitespace-nowrap text-black">{id}</span>
+
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white text-black transform rotate-45" />
           </div>
           <MapPin className="text-white" size={24} />
         </div>
@@ -106,7 +100,13 @@ export default function Plot({
         // }
 
         fill={
-          selectedPatay === id ? 'orange' : graves.length >= 5 ? 'red' : fill
+          selectedPatay === id
+            ? 'orange'
+            : graves.length === 0
+            ? 'black'
+            : graves.length >= 5
+            ? 'red'
+            : 'green'
         }
         fillOpacity="1"
         fillRule="nonzero"

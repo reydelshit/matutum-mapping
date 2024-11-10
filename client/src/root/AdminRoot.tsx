@@ -14,7 +14,7 @@ const AdminRoot = () => {
     }
   }, [isLogin, navigate]);
 
-  return <div>{pathname === '/admin' ? <AdminDashboard /> : <Outlet />}</div>;
+  return <AdminDashboard />;
 };
 
 export default AdminRoot;

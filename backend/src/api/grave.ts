@@ -54,6 +54,27 @@ router.get('/:plot_no', (req: Request<{ plot_no: string }>, res: Response) => {
   );
 });
 
+router.get('/speci/:id', (req: Request<{ id: string }>, res: Response) => {
+  const query = 'SELECT * FROM graves WHERE grave_id = ?';
+  const id = req.params.id;
+
+  //   console.log('Executing query:', query);
+
+  databaseConnection.query(
+    query,
+    [id],
+    (err, data: RowDataPacket[] | ResultSetHeader) => {
+      if (err) return res.status(500).json({ error: err.message });
+
+      if (Array.isArray(data) && data.length > 0) {
+        return res.json(data[0]);
+      }
+
+      return res.status(404).json({ message: 'Grave not found' });
+    },
+  );
+});
+
 // Add a new grave
 router.post('/create', (req: Request, res: Response) => {
   const query = `

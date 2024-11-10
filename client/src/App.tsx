@@ -33,6 +33,15 @@ function App() {
                   RESERVE <br /> YOURS NOW!
                 </h1>
 
+                <p>
+                  The Matutum Memorial Interactive Mapping System is a digital
+                  map designed to help visitors find grave sites easily within
+                  Matutum Memorial Park. Users can search by name to locate
+                  specific plots, see highlighted locations on the map, and view
+                  details about each plot. This system provides a simple,
+                  respectful way for visitors to navigate the park.
+                </p>
+
                 <Link to="/map-visitor">
                   <Button className="rounded-full my-4 bg-white text-black h-[5rem] text-2xl w-[15rem]">
                     Reserve{' '}

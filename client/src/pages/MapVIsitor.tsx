@@ -7,6 +7,8 @@ import axios from 'axios';
 import { Minus, Plus } from 'lucide-react';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
+import BGImage from '@/assets/bg.png';
+
 import {
   TransformComponent,
   TransformWrapper,
@@ -180,7 +182,7 @@ const MapVIsitor = () => {
                 <h1 className="italic text-4xl font-bold my-4">
                   RESERVE YOUR PLOT NOW
                 </h1>
-                <p>By clicking the box in the map</p>
+                <p>Click on a plot in the map to reserve.</p>
 
                 <div>
                   <h1 className="text-4xl font-thin my-4 flex gap-2">
@@ -258,7 +260,10 @@ const MapVIsitor = () => {
 
       {showReserveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-          <div className="w-[90%] md:w-[40%] h-[60%] bg-white text-black rounded-2xl p-4 shadow-lg">
+          <div
+            className="w-[40%] h-[40%] bg-white text-[#fff6f2] rounded-2xl p-4 shadow-lg"
+            style={{ backgroundImage: `url(${BGImage})` }}
+          >
             {/* Modal content */}
             <div className="h-full flex flex-col">
               <div className="flex justify-between items-center mb-4">
@@ -268,12 +273,12 @@ const MapVIsitor = () => {
                   Close
                 </Button>
               </div>
-              <div className="flex-1 text-start">
+              <div className="flex-1 text-start justify-center h-full items-start flex flex-col w-full">
                 <h1 className="text-3xl">SELECTED PLOT: {selectedPlot}</h1>
 
-                <form className="mt-2">
+                <form className="mt-2 w-full">
                   <Input
-                    className="h-[3rem] rounded-md"
+                    className="h-[3rem] rounded-full placeholder:text-white "
                     placeholder="Fullname"
                     type="text"
                     name="fullname"
@@ -282,7 +287,7 @@ const MapVIsitor = () => {
                   />
 
                   <Input
-                    className="h-[3rem] rounded-md mt-2"
+                    className="h-[3rem] rounded-full mt-2 placeholder:text-white "
                     placeholder="Phone or Email"
                     type="text"
                     name="contact_info"
@@ -290,25 +295,23 @@ const MapVIsitor = () => {
                     value={reservationData.contact_information}
                   />
 
-                  <div>
-                    <Label className="text-black" htmlFor="date">
-                      Preferred Date
-                    </Label>
-                    <Input
-                      className="h-[3rem] text-black"
-                      type="date"
-                      id="date"
-                      name="date"
-                      value={reservationData.date}
-                      onChange={handleInput}
-                      required
-                    />
+                  <Label htmlFor="date">Preferred Date</Label>
+                  <Input
+                    className="h-[3rem] rounded-full"
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={reservationData.date}
+                    onChange={handleInput}
+                    required
+                  />
 
+                  <div className="flex justify-end w-full">
                     <Button
-                      className="bg-green-800 h-[3rem] w-fit rounded-full my-4"
+                      className="bg-white text-black h-[3rem] w-fit rounded-full my-4"
                       type="submit"
                     >
-                      Submit Reservation Request
+                      Submit
                     </Button>
                   </div>
                 </form>

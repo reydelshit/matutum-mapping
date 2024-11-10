@@ -1,8 +1,17 @@
 import BGImage from '@/assets/bg.png';
+import PaginationTemplate from '@/components/Pagination';
 import PlotHoveredContainer from '@/components/PlotHoveredContainer';
 import SVGIMAGENEW from '@/components/SVGIMAGENEW';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -12,19 +21,19 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { plots } from '@/data/Plots';
+import { toast } from '@/hooks/use-toast';
+import usePagination from '@/hooks/usePagination';
 import axios from 'axios';
 import { Ellipsis, Minus, Plus } from 'lucide-react';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
   TransformComponent,
   TransformWrapper,
   useControls,
 } from 'react-zoom-pan-pinch';
 import GraveModal from './GravesModal';
-import usePagination from '@/hooks/usePagination';
-import PaginationTemplate from '@/components/Pagination';
-import moment from 'moment';
-import { Link, Outlet, useLocation } from 'react-router-dom';
 
 interface GraveItem {
   grave_id: number;
@@ -34,6 +43,16 @@ interface GraveItem {
   age: number;
   created_at: string;
   plot_no: string;
+}
+
+interface GraveDataInput {
+  grave_id?: number;
+  fullname: string;
+  birthday: string;
+  date_of_death: string;
+  age?: number;
+  created_at?: string;
+  plot_no?: string;
 }
 
 const Controls = () => {
@@ -68,6 +87,17 @@ const AdminDashboard = () => {
   const [graves, setGraves] = useState<GraveItem[]>([]);
   const [searchPatay, setSearchPatay] = useState('');
   const [selectedPatay, setSelectedPatay] = useState('');
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateGraveID, setUpdateGraveID] = useState(0);
+
+  const [graveData, setGraveData] = useState({} as GraveDataInput);
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGraveData({
+      ...graveData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const path = useLocation().pathname;
   const itemsPerPage = 10;
@@ -102,6 +132,81 @@ const AdminDashboard = () => {
 
     setShowModal(!showModal);
   };
+
+  const handleDeleteGrave = async (id: number) => {
+    try {
+      const res = await axios.delete(
+        `${import.meta.env.VITE_SERVER_LINK}/api/grave/delete/${id}`,
+      );
+
+      console.log(res.data);
+
+      toast({
+        title: 'Success',
+        description: 'Grave deleted successfully',
+      });
+
+      fetchGraves();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleUpdateModal = async (id: number) => {
+    setUpdateGraveID(id);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_SERVER_LINK}/api/grave/speci/${id}`,
+      );
+
+      console.log(res.data, 'specific grave');
+
+      if (res.data) {
+        setGraveData({
+          fullname: res.data.fullname,
+          age: res.data.age,
+          birthday: res.data.birthday,
+          date_of_death: res.data.date_of_death,
+          plot_no: res.data.plot_no,
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+    setShowUpdateModal(!showUpdateModal);
+  };
+
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_SERVER_LINK}/api/grave/update/${updateGraveID}`,
+        {
+          ...graveData,
+          plot_no: graveData.plot_no,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (res.data.status === 'success') {
+        toast({
+          title: 'Success',
+          description: 'Grave updated successfully',
+        });
+
+        setShowUpdateModal(false);
+        fetchGraves();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div
       style={{ backgroundImage: `url(${BGImage})` }}
@@ -239,7 +344,24 @@ const AdminDashboard = () => {
                       <TableCell>{grave.plot_no}</TableCell>
 
                       <TableCell>
-                        <Ellipsis className="h-4 w-4" color="white" />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Ellipsis className="h-4 w-4" color="white" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={() => handleUpdateModal(grave.grave_id)}
+                            >
+                              Update
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteGrave(grave.grave_id)}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -264,6 +386,96 @@ const AdminDashboard = () => {
           setShowModal={setShowModal}
           fetchGraves={fetchGraves}
         />
+      )}
+
+      {showUpdateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 text-black">
+          <div
+            className="w-[40%] max-w-6xl mx-auto  border-none text-white p-4 rounded-md"
+            style={{ backgroundImage: `url(${BGImage})` }}
+          >
+            <h1 className="text-2xl my-4">UPDATE GRAVE DETAILS</h1>
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullname" className="text-white">
+                  Full Name
+                </Label>
+                <Input
+                  id="fullname"
+                  className="bg-white/20 border-white/30 text-white placeholder-white/50 placeholder:text-white h-[3rem]"
+                  value={graveData.fullname}
+                  onChange={handleInput}
+                  type="text"
+                  placeholder="Enter full name"
+                  name="fullname"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="age" className="text-white">
+                  Age
+                </Label>
+                <Input
+                  id="age"
+                  className="bg-white/20 border-white/30 text-white placeholder-white/50 placeholder:text-white h-[3rem]"
+                  value={graveData.age}
+                  onChange={handleInput}
+                  type="number"
+                  placeholder="Enter age"
+                  name="age"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="birthday" className="text-white">
+                  Date of Birth
+                </Label>
+                <Input
+                  id="birthday"
+                  className="bg-white/20 border-white/30 text-white placeholder-white/50 placeholder:text-white h-[3rem]"
+                  value={graveData.birthday.split('T')[0]}
+                  onChange={handleInput}
+                  type="date"
+                  name="birthday"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date_of_death" className="text-white">
+                  Date of Death
+                </Label>
+                <Input
+                  id="date_of_death"
+                  className="bg-white/20 border-white/30 text-white placeholder-white/50 placeholder:text-white h-[3rem]"
+                  value={graveData.date_of_death.split('T')[0]}
+                  onChange={handleInput}
+                  type="date"
+                  name="date_of_death"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  variant={'secondary'}
+                  className="w-full bg-white text-green-800 hover:bg-white/90 h-[3rem] rounded-full"
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="w-full bg-white text-green-800 hover:bg-white/90 h-[3rem] rounded-full"
+                  type="submit"
+                >
+                  Update
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

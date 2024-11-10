@@ -3,6 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
+import BGImage from '@/assets/bg.png';
+
 import { useEffect, useState } from 'react';
 import {
   Table,
@@ -13,6 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import moment from 'moment';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trash2 } from 'lucide-react';
 
 interface GraveItem {
   grave_id: number;
@@ -101,6 +106,13 @@ const GraveModal = ({
 
         fetchGravesModal();
         fetchGraves();
+
+        setGraveData({
+          fullname: '',
+          age: 0,
+          birthday: '',
+          date_of_death: '',
+        });
       }
     } catch (e) {
       console.log(e);
@@ -115,6 +127,11 @@ const GraveModal = ({
 
       console.log(res.data);
 
+      toast({
+        title: 'Success',
+        description: 'Grave deleted successfully',
+      });
+
       fetchGravesModal();
     } catch (e) {
       console.log(e);
@@ -123,99 +140,164 @@ const GraveModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 text-black">
-      <div className="w-[80%] h-[80%] border-2 bg-white rounded-2xl p-4">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex gap-4">
-            <h1 className="font-semibold text-2xl">{selectedPlot}</h1>
+      <Card
+        className="w-full max-w-6xl mx-auto border-none text-white"
+        style={{ backgroundImage: `url(${BGImage})` }}
+      >
+        <CardHeader className="border-b border-white/20">
+          <CardTitle className="text-3xl font-bold text-center flex justify-between">
+            <h1> Grave Management - {selectedPlot}</h1>
+            <Button
+              onClick={() => {
+                setShowModal(false);
+                fetchGraves();
+              }}
+              className="w-fit bg-white text-green-800 hover:bg-white/90"
+            >
+              Close
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-1">
+              <h2 className="text-2xl font-bold mb-4">Add New Grave</h2>
+              <form onSubmit={handleAddGrave} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullname" className="text-white">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="fullname"
+                    className="bg-white/20 border-white/30 text-white placeholder-white/50 placeholder:text-white"
+                    value={graveData.fullname}
+                    onChange={handleInput}
+                    type="text"
+                    placeholder="Enter full name"
+                    name="fullname"
+                    required
+                  />
+                </div>
 
-            <span>{graves.length} / 5</span>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="age" className="text-white">
+                    Age
+                  </Label>
+                  <Input
+                    id="age"
+                    className="bg-white/20 border-white/30 text-white placeholder-white/50"
+                    value={graveData.age}
+                    onChange={handleInput}
+                    type="number"
+                    placeholder="Enter age"
+                    name="age"
+                    required
+                  />
+                </div>
 
-          <Button onClick={() => setShowModal(false)}>Closess</Button>
-        </div>
+                <div className="space-y-2">
+                  <Label htmlFor="birthday" className="text-white">
+                    Date of Birth
+                  </Label>
+                  <Input
+                    id="birthday"
+                    className="bg-white/20 border-white/30 text-white placeholder-white/50"
+                    value={graveData.birthday}
+                    onChange={handleInput}
+                    type="date"
+                    name="birthday"
+                    required
+                  />
+                </div>
 
-        <div className="w-full">
-          <h1>ADD GRAVE</h1>
-          <div className="flex justify-between gap-8 mt-4">
-            <form onSubmit={handleAddGrave} className=" w-[50%]">
-              <Label>Fullname</Label>
-              <Input
-                className="h-[3rem]"
-                onChange={handleInput}
-                type="text"
-                placeholder="Fullname"
-                name="fullname"
-              />
+                <div className="space-y-2">
+                  <Label htmlFor="date_of_death" className="text-white">
+                    Date of Death
+                  </Label>
+                  <Input
+                    id="date_of_death"
+                    className="bg-white/20 border-white/30 text-white placeholder-white/50"
+                    value={graveData.date_of_death}
+                    onChange={handleInput}
+                    type="date"
+                    name="date_of_death"
+                    required
+                  />
+                </div>
 
-              <Label>Age</Label>
-              <Input
-                className="h-[3rem]"
-                name="age"
-                onChange={handleInput}
-                type="number"
-                placeholder="Age"
-              />
+                <Button
+                  className="w-full bg-white text-green-800 hover:bg-white/90"
+                  disabled={graves.length >= 5}
+                  type="submit"
+                >
+                  {graves.length >= 5 ? 'Plot is Full' : 'Add Grave'}
+                </Button>
+              </form>
+            </div>
 
-              <Label>Birthday</Label>
-              <Input
-                className="h-[3rem]"
-                name="birthday"
-                onChange={handleInput}
-                type="date"
-              />
-
-              <Label>Date of Death</Label>
-              <Input
-                className="h-[3rem]"
-                name="date_of_death"
-                onChange={handleInput}
-                type="date"
-              />
-
-              <Button className="mt-2" disabled={graves.length >= 5}>
-                {graves.length >= 5 ? 'PLOT IS FULL' : 'SAVE'}
-              </Button>
-            </form>
-
-            <div className="w-[50%]">
-              <h1>LIST OF GRAVES INSIDE OF PLOT</h1>
+            <div className="md:col-span-2">
+              <h2 className="text-2xl font-bold mb-4">Graves in Plot</h2>
               <Table>
-                <TableCaption>
-                  A list of graves in plot {selectedPlot}.
+                <TableCaption className="text-white/70">
+                  Current graves in Plot 79 ({graves.length}/5)
                 </TableCaption>
                 <TableHeader>
-                  <TableRow>
-                    <TableCell>Grave ID</TableCell>
-                    <TableCell>Fullname</TableCell>
-                    <TableCell>Birthday</TableCell>
-                    <TableCell>Date of Death</TableCell>
-                    <TableCell>Age</TableCell>
-                    <TableCell>Actions</TableCell>
+                  <TableRow className="border-white/20">
+                    <TableHead className="text-white">ID</TableHead>
+                    <TableHead className="text-white">Full Name</TableHead>
+                    <TableHead className="text-white">Date of Birth</TableHead>
+                    <TableHead className="text-white">Date of Death</TableHead>
+                    <TableHead className="text-white">Age</TableHead>
+                    <TableHead className="text-white text-right">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {graves.map((grave, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{grave.grave_id}</TableCell>
-                      <TableCell>{grave.fullname}</TableCell>
-                      <TableCell>{grave.birthday}</TableCell>
-                      <TableCell>{grave.date_of_death}</TableCell>
-                      <TableCell>{grave.age}</TableCell>
-                      <TableCell>
+                  {graves.map((grave) => (
+                    <TableRow key={grave.grave_id} className="border-white/20">
+                      <TableCell className="font-medium text-white">
+                        {grave.grave_id}
+                      </TableCell>
+                      <TableCell className="text-white">
+                        {grave.fullname}
+                      </TableCell>
+                      <TableCell className="text-white">
+                        {moment(grave.birthday).format('MMM Do YY')}
+                      </TableCell>
+                      <TableCell className="text-white">
+                        {moment(grave.date_of_death).format('MMM Do YY')}
+                      </TableCell>
+                      <TableCell className="text-white">{grave.age}</TableCell>
+                      <TableCell className="text-right">
                         <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleDeleteGrave(grave.grave_id)}
+                          className="text-white hover:text-red-300 hover:bg-red-500/20"
                         >
-                          Delete
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete</span>
                         </Button>
                       </TableCell>
                     </TableRow>
                   ))}
+                  {graves.length === 0 && (
+                    <TableRow className="border-white/20">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center text-white/50"
+                      >
+                        No graves added yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

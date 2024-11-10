@@ -53,8 +53,8 @@ router.get('/speci/:id', (req: Request<{ id: string }>, res: Response) => {
 // Add a new reservation
 router.post('/create', (req: Request, res: Response) => {
   const query = `
-    INSERT INTO reservations (fullname, plot_no, contact_info, date, created_at, message) 
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO reservations (fullname, plot_no, contact_info, date, created_at, message, status) 
+    VALUES (?, ?, ?, ?, ?, ?, 'Pending')
   `;
 
   const created_at = new Date();
@@ -134,6 +134,35 @@ router.delete('/delete/:id', (req: Request<{ id: string }>, res: Response) => {
 
     return res.json({
       message: 'Successfully deleted reservation',
+      status: 'success',
+    });
+  });
+});
+
+// Update reservation status
+router.put('/status/:id', (req: Request<{ id: string }>, res: Response) => {
+  const query = `
+    UPDATE reservations 
+    SET status = ?
+    WHERE reservation_id = ?
+  `;
+
+  const { status } = req.body as { status: string };
+
+  const values = [status, parseInt(req.params.id)];
+
+  databaseConnection.query(query, values, (err, data: ResultSetHeader) => {
+    if (err) {
+      console.error('SQL Error:', err);
+      return res.status(500).json({ error: 'Database update failed' });
+    }
+
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ message: 'Reservation not found' });
+    }
+
+    return res.json({
+      message: 'Successfully updated reservation',
       status: 'success',
     });
   });

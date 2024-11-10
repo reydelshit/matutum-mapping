@@ -1,4 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import BGImage from '@/assets/bg.png';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -8,24 +21,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import BGImage from '@/assets/bg.png';
+import { useEffect, useState } from 'react';
 
-import axios from 'axios';
-import moment from 'moment';
-import { Button } from '@/components/ui/button';
-import { MessageCircleMore, Trash2 } from 'lucide-react';
-import PaginationTemplate from '@/components/Pagination';
-import usePagination from '@/hooks/usePagination';
-import { Input } from '@/components/ui/input';
 import EmailForm from '@/components/EmailForm';
+import PaginationTemplate from '@/components/Pagination';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
+import usePagination from '@/hooks/usePagination';
+import axios from 'axios';
+import { MessageCircleMore } from 'lucide-react';
+import moment from 'moment';
 
 interface ReservationItem {
   reservation_id: number;
@@ -35,6 +41,7 @@ interface ReservationItem {
   date: string;
   created_at: string;
   message: string;
+  status: string;
 }
 const Reservations = () => {
   const [reservationsData, setReservationsData] = useState<ReservationItem[]>(
@@ -43,6 +50,9 @@ const Reservations = () => {
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [sendToEmail, setSendToEmail] = useState('');
   const [sendToName, setSendToName] = useState('');
+  const [reservationStatus, setReservationStatus] = useState('All');
+  const [reservationID, setReservationID] = useState(0);
+  const [searchReservation, setSearchReservation] = useState('');
   const itemsPerPage = 10;
 
   const fetchReservations = async () => {
@@ -63,10 +73,21 @@ const Reservations = () => {
     fetchReservations();
   }, []);
 
+  const filteredReservations = reservationsData.filter(
+    (reservation) =>
+      (reservation.fullname
+        .toLowerCase()
+        .includes(searchReservation.toLowerCase()) ||
+        reservation.contact_info
+          .toLowerCase()
+          .includes(searchReservation.toLowerCase())) &&
+      (reservation.status === reservationStatus || reservationStatus === 'All'),
+  );
+
   const { currentItems, totalPages, currentPage, handlePageChange } =
     usePagination({
       itemsPerPage: itemsPerPage,
-      data: reservationsData || [],
+      data: filteredReservations || [],
     });
 
   const handleDeleteReservations = async (id: number) => {
@@ -95,10 +116,23 @@ const Reservations = () => {
           LIST OF PLOT RESERVATIONS
         </h2>
 
-        <Input
-          placeholder="Search for a reservation"
-          className="w-[30%] h-[3rem] placeholder:text-white"
-        />
+        <div className="flex items-center h-[4rem] gap-4">
+          <Select onValueChange={(value) => setReservationStatus(value)}>
+            <SelectTrigger className="w-[180px] h-full">
+              <SelectValue placeholder="Filter status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All</SelectItem>
+              <SelectItem value="Done">Done</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            onChange={(e) => setSearchReservation(e.target.value)}
+            placeholder="Search for a reservation"
+            className="w-[350px] h-full placeholder:text-white"
+          />
+        </div>
       </div>
       <div className="w-[80%]">
         <Table>
@@ -122,6 +156,9 @@ const Reservations = () => {
               </TableHead>
 
               <TableHead className="text-white text-center">Message</TableHead>
+
+              <TableHead className="text-white text-center">Status</TableHead>
+
               <TableHead className="text-white text-center">
                 Created at
               </TableHead>
@@ -153,12 +190,22 @@ const Reservations = () => {
                 <TableCell className="text-white">
                   {reservation.message}
                 </TableCell>
+
+                <TableCell className="text-white">
+                  {reservation.status === 'Pending' ? (
+                    <span className="text-yellow-500">
+                      {reservation.status}
+                    </span>
+                  ) : (
+                    <span className="text-green-500">{reservation.status}</span>
+                  )}
+                </TableCell>
                 <TableCell className="text-white">
                   {moment(reservation.created_at).format('MMM Do YY')}
                 </TableCell>
                 <TableCell className="w-[250px]">
                   <div>
-                    <Button
+                    {/* <Button
                       onClick={() =>
                         handleDeleteReservations(reservation.reservation_id)
                       }
@@ -167,7 +214,7 @@ const Reservations = () => {
                     >
                       <Trash2 className="h-4 w-4" />
                       Delete
-                    </Button>
+                    </Button> */}
 
                     <DropdownMenu>
                       <DropdownMenuTrigger>
@@ -185,7 +232,7 @@ const Reservations = () => {
                             onClick={() => {
                               setSendToEmail(reservation.contact_info);
                               setSendToName(reservation.fullname);
-
+                              setReservationID(reservation.reservation_id);
                               setShowEmailForm(true);
                             }}
                             className="text-black"
@@ -227,6 +274,8 @@ const Reservations = () => {
             style={{ backgroundImage: `url(${BGImage})` }}
           >
             <EmailForm
+              fetchReservations={fetchReservations}
+              reservationID={reservationID}
               sendToName={sendToName}
               setShowEmailForm={setShowEmailForm}
               sendTo={sendToEmail}

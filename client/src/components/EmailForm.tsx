@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Send } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import emailjs from '@emailjs/browser';
+import axios from 'axios';
+import { Send } from 'lucide-react';
+import React, { useState } from 'react';
 
 type InputType =
   | React.ChangeEvent<HTMLInputElement>
@@ -11,10 +11,14 @@ const EmailForm = ({
   sendTo,
   sendToName,
   setShowEmailForm,
+  reservationID,
+  fetchReservations,
 }: {
   sendTo: string;
   sendToName: string;
   setShowEmailForm: (e: boolean) => void;
+  reservationID: number;
+  fetchReservations: () => void;
 }) => {
   const [formData, setFormData] = useState({
     to_email: sendTo || '',
@@ -57,6 +61,19 @@ const EmailForm = ({
         subject: '',
         message: '',
       });
+
+      const changeStatusReservations = await axios.put(
+        `${
+          import.meta.env.VITE_SERVER_LINK
+        }/api/reservation/status/${reservationID}`,
+        {
+          status: 'Done',
+        },
+      );
+
+      console.log(changeStatusReservations.data);
+
+      fetchReservations();
     } catch (error) {
       setStatus('Failed to send email');
     }
@@ -75,7 +92,6 @@ const EmailForm = ({
           <input
             type="email"
             name="to_email"
-            defaultValue={sendTo}
             value={formData.to_email}
             onChange={handleChange}
             className="w-full p-2 border rounded-md text-black"
@@ -111,7 +127,10 @@ const EmailForm = ({
 
         <div className="flex justify-end gap-4">
           <button
-            onClick={() => setShowEmailForm(false)}
+            onClick={() => {
+              fetchReservations();
+              setShowEmailForm(false);
+            }}
             className="bg-white text-black px-4 py-2 rounded-md  flex items-center gap-2"
           >
             Cancel
@@ -128,6 +147,7 @@ const EmailForm = ({
 
       {status && (
         <div
+          className="bg-white p-2 rounded-md"
           style={{
             marginTop: '20px',
             color: status.includes('Failed') ? 'red' : 'green',

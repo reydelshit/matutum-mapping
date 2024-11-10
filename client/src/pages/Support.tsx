@@ -33,7 +33,7 @@ export default function CustomerSupport() {
   };
 
   return (
-    <div className="flex h-[750px] items-center">
+    <div className="flex h-[750px] items-center ">
       <div className="w-1/2 p-6 overflow-auto">
         <h1 className="text-2xl font-bold mb-4">Matutum Memorial Park FAQs</h1>
         <Accordion type="single" collapsible className="w-full">
@@ -77,7 +77,7 @@ export default function CustomerSupport() {
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="w-1/2 h-[70%] p-6 bg-white rounded-md text-black ">
+      {/* <div className="w-1/2 h-[70%] p-6 bg-white rounded-md text-black ">
         <h2 className="text-2xl font-bold mb-4 text-black ">
           Make a Reservation
         </h2>
@@ -142,7 +142,7 @@ export default function CustomerSupport() {
             Submit Reservation Request
           </Button>
         </form>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -26,7 +26,7 @@ const Login = () => {
       style={{ backgroundImage: `url(${BGImage})` }}
       className=" bg-cover bg-center p-8 w-full min-h-screen h-full flex items-center justify-center flex-col px-[6rem] "
     >
-      <div className="w-full text-center flex  justify-center items-center">
+      <div className="w-full text-center flex  justify-center items-center gap-[5rem]">
         <h1 className="text-6xl text-wrap break-words w-[40%] text-start font-bold text-white">
           MATUTUM MEMORIAL INTERACTIVE MAPPING SYSTEM
         </h1>

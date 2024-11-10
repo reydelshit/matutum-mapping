@@ -284,7 +284,7 @@ const AdminDashboard = () => {
                     setSelectedPatay('');
                   }
                 }}
-                placeholder="Search patay"
+                placeholder="Search for deceased person"
                 className="placeholder:text-white w-[70%] h-[3rem] border-2 rounded-full self-end"
               />
 
@@ -362,12 +362,12 @@ const AdminDashboard = () => {
                             >
                               Update
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
+                            {/* <DropdownMenuSeparator /> */}
+                            {/* <DropdownMenuItem
                               onClick={() => handleDeleteGrave(grave.grave_id)}
                             >
                               Delete
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

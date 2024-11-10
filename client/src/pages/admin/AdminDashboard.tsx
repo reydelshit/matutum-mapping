@@ -214,7 +214,7 @@ const AdminDashboard = () => {
     >
       <div className="w-full  text-center ">
         <div className=" flex justify-between  h-[6rem] items-center w-full ">
-          <h1 className="text-8xl font-bold">HELLO ADMIN!</h1>
+          <h1 className="text-6xl font-bold">HELLO ADMIN!</h1>
 
           <span>NOV 8, 2024 GMT+8 10:30 AM</span>
 
@@ -225,7 +225,15 @@ const AdminDashboard = () => {
             <Link to="/admin/reservations">RESERVATIONS</Link>
           </span>
 
-          <span className="cursor-pointer">LOGOUT</span>
+          <span
+            className="cursor-pointer"
+            onClick={() => {
+              localStorage.removeItem('isLoginMatutumMapping');
+              window.location.href = '/';
+            }}
+          >
+            LOGOUT
+          </span>
         </div>
 
         {path === '/admin' ? (

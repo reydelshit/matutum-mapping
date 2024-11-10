@@ -6,13 +6,13 @@ const AdminRoot = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const isLogin = true;
+  const isLoginMatutumMapping = localStorage.getItem('isLoginMatutumMapping');
 
   useEffect(() => {
-    if (!isLogin) {
-      navigate('/admin/login');
+    if (!isLoginMatutumMapping) {
+      navigate('/login');
     }
-  }, [isLogin, navigate]);
+  }, [isLoginMatutumMapping, navigate]);
 
   return <AdminDashboard />;
 };

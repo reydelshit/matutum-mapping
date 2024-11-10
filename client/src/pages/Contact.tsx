@@ -1,9 +1,8 @@
-import { Contact2Icon, Mail, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import MainImage from '@/assets/main.png';
+import { Contact2Icon, Mail, MapPin } from 'lucide-react';
 const Contact = () => {
   return (
-    <div className="w-full  text-center h-[800px]">
+    <div className="w-full text-center h-[800px]">
       <div className="h-[250px] flex items-start w-full flex-col justify-center">
         <h1 className="text-start text-6xl my-4">Meet us</h1>
 

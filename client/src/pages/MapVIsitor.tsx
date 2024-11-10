@@ -16,6 +16,8 @@ import {
 } from 'react-zoom-pan-pinch';
 import MainImage from '@/assets/main.png';
 import { Label } from '@/components/ui/label';
+import { toast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 interface GraveItem {
   grave_id: number;
@@ -26,6 +28,12 @@ interface GraveItem {
   created_at: string;
   plot_no: string;
 }
+
+import React from 'react';
+
+type InputType =
+  | React.ChangeEvent<HTMLInputElement>
+  | React.ChangeEvent<HTMLTextAreaElement>;
 
 const Controls = () => {
   const { zoomIn, zoomOut } = useControls();
@@ -65,13 +73,12 @@ const MapVIsitor = () => {
 
   const [reservationData, setReservationData] = useState({
     fullname: '',
-    contact_information: '',
-    plot_no: '',
-    plot_type: '',
+    contact_info: '',
     date: '',
+    message: '',
   });
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInput = (e: InputType) => {
     setReservationData({
       ...reservationData,
       [e.target.name]: e.target.value,
@@ -95,6 +102,40 @@ const MapVIsitor = () => {
   useEffect(() => {
     fetchGraves();
   }, []);
+
+  const handleReservation = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    console.log(reservationData, selectedPlot);
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_SERVER_LINK}/api/reservation/create`,
+        {
+          plot_no: selectedPlot,
+          ...reservationData,
+        },
+
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (res.data.status === 'success') {
+        console.log(res.data);
+        setShowReserveModal(false);
+
+        toast({
+          title: 'Reservation Successful',
+          description: 'You have successfully reserved a plot',
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="w-full text-center h-[800px] relative">
@@ -156,7 +197,7 @@ const MapVIsitor = () => {
                   {selectedPatayDetails.fullname}
                 </h1>
 
-                <div className="mt-[2rem]">
+                <div className="mt-[4rem]">
                   <h2 className="text-xl">{selectedPatayDetails.fullname}</h2>
                   <p className="italic text-4xl font-bold my-4">
                     {moment(selectedPatayDetails.birthday).format('YYYY')} -{' '}
@@ -169,6 +210,8 @@ const MapVIsitor = () => {
                     </span>{' '}
                     {selectedPatayDetails.plot_no}
                   </h1>
+
+                  <p className="mt-6">No additional Details</p>
                 </div>
               </div>
             ) : (
@@ -224,7 +267,7 @@ const MapVIsitor = () => {
               contentClass="w-fit h-fit"
             >
               <svg
-                className="rotate-[270deg]"
+                className="rotate-[270deg] rounded-md overflow-hidden"
                 width="297mm"
                 height="210mm"
                 viewBox="0 0 1122.5197 793.70081"
@@ -261,7 +304,7 @@ const MapVIsitor = () => {
       {showReserveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
           <div
-            className="w-[40%] h-[40%] bg-white text-[#fff6f2] rounded-2xl p-4 shadow-lg"
+            className="w-[40%] h-fit bg-white text-[#fff6f2] rounded-2xl p-4 shadow-lg"
             style={{ backgroundImage: `url(${BGImage})` }}
           >
             {/* Modal content */}
@@ -274,9 +317,14 @@ const MapVIsitor = () => {
                 </Button>
               </div>
               <div className="flex-1 text-start justify-center h-full items-start flex flex-col w-full">
-                <h1 className="text-3xl">SELECTED PLOT: {selectedPlot}</h1>
+                <h1 className="text-2xl my-2">
+                  SELECTED PLOT:{' '}
+                  <span className='bg-green-800 inline-block p-2 rounded-md"'>
+                    {selectedPlot}
+                  </span>
+                </h1>
 
-                <form className="mt-2 w-full">
+                <form onSubmit={handleReservation} className="mt-2 w-full">
                   <Input
                     className="h-[3rem] rounded-full placeholder:text-white "
                     placeholder="Fullname"
@@ -288,11 +336,11 @@ const MapVIsitor = () => {
 
                   <Input
                     className="h-[3rem] rounded-full mt-2 placeholder:text-white "
-                    placeholder="Phone or Email"
-                    type="text"
+                    placeholder="Email"
+                    type="email"
                     name="contact_info"
                     onChange={handleInput}
-                    value={reservationData.contact_information}
+                    value={reservationData.contact_info}
                   />
 
                   <Label htmlFor="date">Preferred Date</Label>
@@ -306,12 +354,22 @@ const MapVIsitor = () => {
                     required
                   />
 
+                  <Textarea
+                    className="rounded-md mt-2 placeholder:text-white"
+                    placeholder="Message"
+                    name="message"
+                    value={reservationData.message}
+                    onChange={handleInput}
+                  >
+                    {' '}
+                  </Textarea>
+
                   <div className="flex justify-end w-full">
                     <Button
                       className="bg-white text-black h-[3rem] w-fit rounded-full my-4"
                       type="submit"
                     >
-                      Submit
+                      Reserve Now
                     </Button>
                   </div>
                 </form>

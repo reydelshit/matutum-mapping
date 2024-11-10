@@ -96,8 +96,6 @@ const GraveModal = ({
 
       console.log(res.data, 'sdandk');
 
-      console.log(res.data.status);
-
       if (res.data.status === 'success') {
         toast({
           title: 'Success',

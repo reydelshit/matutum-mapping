@@ -101,12 +101,12 @@ export default function Plot({ id, d, onClick, selectedPatay }: PlotProps) {
 
         fill={
           selectedPatay === id
-            ? 'orange'
+            ? '#eab308'
             : graves.length === 0
-            ? 'black'
+            ? '#000000'
             : graves.length >= 5
-            ? 'red'
-            : 'green'
+            ? '#ef4444'
+            : '#22c55e'
         }
         fillOpacity="1"
         fillRule="nonzero"

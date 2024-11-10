@@ -1,8 +1,10 @@
-import { Router, Request, Response } from 'express';
-import { inventoryRouter } from '../api/inventory';
+import { Router } from 'express';
+import { graveRouter } from '../api/grave';
+import { reservationRouter } from '../api/reservation';
 
 const router = Router();
 
-router.get('/inventory', inventoryRouter);
+router.use('/grave', graveRouter);
+router.use('/reservation', reservationRouter);
 
 export default router;

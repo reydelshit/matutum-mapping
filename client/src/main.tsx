@@ -39,16 +39,14 @@ const router = createBrowserRouter([
       },
     ],
   },
-
+  {
+    path: 'login',
+    element: <Login />,
+  },
   {
     path: '/admin',
     element: <AdminRoot />,
     children: [
-      {
-        path: 'login',
-        element: <Login />,
-      },
-
       {
         path: 'reservations',
         element: <Reservations />,

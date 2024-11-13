@@ -70,7 +70,7 @@ const MapVIsitor = () => {
     {} as GraveItem,
   );
   const [selectedPlot, setSelectedPlot] = useState('');
-
+  const [plotLength, setPlotLength] = useState(0);
   const [reservationData, setReservationData] = useState({
     fullname: '',
     contact_info: '',
@@ -94,6 +94,20 @@ const MapVIsitor = () => {
       console.log(res.data, 'selected graves');
 
       setGraves(res.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchGravesWithID = async (id: string) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_SERVER_LINK}/api/grave/${id}`,
+      );
+
+      console.log(res.data, 'selected graves');
+
+      setPlotLength(res.data.length);
     } catch (e) {
       console.log(e);
     }
@@ -151,7 +165,7 @@ const MapVIsitor = () => {
                   setSelectedPatay('');
                 }
               }}
-              placeholder="Search patay"
+              placeholder="Search..."
               className="placeholder:text-white w-full h-[3rem] border-2 rounded-full self-end"
             />
 
@@ -290,6 +304,7 @@ const MapVIsitor = () => {
                       onClick={() => {
                         setShowReserveModal(true);
                         setSelectedPlot(`PLOT_${index + 1}`);
+                        fetchGravesWithID(`PLOT_${index + 1}`);
                       }}
                     />
                   ))}
@@ -310,7 +325,12 @@ const MapVIsitor = () => {
             {/* Modal content */}
             <div className="h-full flex flex-col">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Reserve Plot</h2>
+                <h2 className="text-xl font-semibold">
+                  Reserve Plot -{' '}
+                  {plotLength >= 5
+                    ? 'FULL'
+                    : 'AVAILABLE - ' + plotLength + ' plots left'}
+                </h2>
 
                 <Button onClick={() => setShowReserveModal(false)}>
                   Close
@@ -366,6 +386,7 @@ const MapVIsitor = () => {
 
                   <div className="flex justify-end w-full">
                     <Button
+                      disabled={plotLength >= 5 ? true : false}
                       className="bg-white text-black h-[3rem] w-fit rounded-full my-4"
                       type="submit"
                     >

@@ -33,7 +33,7 @@ export default function CustomerSupport() {
   };
 
   return (
-    <div className="flex h-[750px] items-center ">
+    <div className="flex h-[750px] items-center justify-center">
       <div className="w-1/2 p-6 overflow-auto">
         <h1 className="text-2xl font-bold mb-4">Matutum Memorial Park FAQs</h1>
         <Accordion type="single" collapsible className="w-full">

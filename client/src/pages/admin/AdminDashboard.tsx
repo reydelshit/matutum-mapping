@@ -91,7 +91,7 @@ const AdminDashboard = () => {
   const [updateGraveID, setUpdateGraveID] = useState(0);
 
   const [graveData, setGraveData] = useState({} as GraveDataInput);
-
+  const [gravesMap, setGravesMap] = useState<GraveItem[]>([]);
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGraveData({
       ...graveData,
@@ -202,6 +202,20 @@ const AdminDashboard = () => {
         setShowUpdateModal(false);
         fetchGraves();
       }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchGravesMap = async (id: string) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_SERVER_LINK}/api/grave/${id}`,
+      );
+
+      console.log(res.data, 'selected graves');
+
+      setGravesMap(res.data);
     } catch (e) {
       console.log(e);
     }
